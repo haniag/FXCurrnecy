@@ -130,6 +130,31 @@ final class ConverterViewModel {
         currencies.first { $0.code == code }
     }
 
+    /// Every currency below the main one: the rows of the list.
+    var otherCurrencies: [Currency] { Array(currencies.dropFirst()) }
+
+    // MARK: - Rates
+
+    /// What one of `currency` is worth in the main currency: "1 ILS = 0.332 USD".
+    ///
+    /// Nil for the main currency itself, and while either rate is missing.
+    func inverseRateText(for currency: Currency) -> String? {
+        guard currency.code != mainCode,
+              let rate = rates[currency.code], rate != 0,
+              let main = rates[mainCode]
+        else { return nil }
+        return "1 \(currency.code) = \(Self.rateText(main / rate)) \(mainCode)"
+    }
+
+    /// One of the main currency in `currency`, e.g. "3.673", for the rate
+    /// column in the add sheet. Nil while either rate is missing.
+    func unitRateText(for currency: Currency) -> String? {
+        guard let rate = rates[currency.code],
+              let main = rates[mainCode], main != 0
+        else { return nil }
+        return Self.rateText(rate / main)
+    }
+
     // MARK: - Amounts
 
     /// Offered when a currency is selected. Quoting against 1 is the common
@@ -225,6 +250,12 @@ final class ConverterViewModel {
         currencies.move(fromOffsets: offsets, toOffset: destination)
     }
 
+    /// Remove one currency, wherever it sits. The add sheet's toggles use this.
+    func remove(_ currency: Currency) {
+        guard let index = currencies.firstIndex(where: { $0.code == currency.code }) else { return }
+        remove(at: IndexSet(integer: index))
+    }
+
     func remove(at offsets: IndexSet) {
         let removingAnchor = offsets.contains { currencies[$0].code == anchorCode }
         currencies.remove(atOffsets: offsets)
@@ -271,8 +302,25 @@ final class ConverterViewModel {
         editFormatter.string(from: amount as NSDecimalNumber) ?? "0"
     }
 
+    /// For rates rather than amounts. Up to 3 decimal places like everything
+    /// else, except below 1, where 3 significant digits stop a small rate from
+    /// rounding away: 1 TRY shows as 0.0205 USD rather than 0.02, and 1 LBP
+    /// as 0.0000112 rather than 0.
+    static func rateText(_ rate: Decimal) -> String {
+        let formatter = rate < 1 ? smallRateFormatter : displayFormatter
+        return formatter.string(from: rate as NSDecimalNumber) ?? "0"
+    }
+
     private static let displayFormatter = makeFormatter(grouping: true)
     private static let editFormatter = makeFormatter(grouping: false)
+
+    private static let smallRateFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.usesSignificantDigits = true
+        formatter.maximumSignificantDigits = 3
+        return formatter
+    }()
 
     private static func makeFormatter(grouping: Bool) -> NumberFormatter {
         let formatter = NumberFormatter()
