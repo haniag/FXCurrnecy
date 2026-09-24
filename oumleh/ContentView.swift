@@ -30,10 +30,8 @@ struct ContentView: View {
                 if let main = model.currencies.first {
                     MainCurrencyHeader(
                         currency: main,
-                        choices: model.currencies,
                         text: amountBinding(for: main),
-                        focusedCode: $focusedCode,
-                        onChoose: makeMain
+                        focusedCode: $focusedCode
                     )
                     list
                 } else {
@@ -141,7 +139,7 @@ struct ContentView: View {
     }
 
     /// Move `currency` to the top, quoted at 1, with everything else converted
-    /// from it. What tapping a row and the header's menu both do.
+    /// from it. What tapping a row does.
     private func makeMain(_ currency: Currency) {
         focusedCode = nil
         withAnimation(.snappy) { model.makeMain(currency) }

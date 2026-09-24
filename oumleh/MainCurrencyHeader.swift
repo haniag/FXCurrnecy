@@ -8,16 +8,12 @@ import SwiftUI
 /// The top of the main screen: which currency everything is quoted against,
 /// and how much of it.
 ///
-/// The name above the amount is a menu for picking a different main currency.
 /// The amount is the one field the user types into; every row below is worked
-/// out from it.
+/// out from it. To change the main currency, the user taps one of those rows.
 struct MainCurrencyHeader: View {
     let currency: Currency
-    /// The whole list, offered in the menu.
-    let choices: [Currency]
     @Binding var text: String
     @FocusState.Binding var focusedCode: String?
-    let onChoose: (Currency) -> Void
 
     /// How wide the amount line may get, measured, so a long amount can shrink
     /// to fit on one line.
@@ -25,7 +21,7 @@ struct MainCurrencyHeader: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            picker
+            nameLine
             amountLine
         }
         .padding(.horizontal, 20)
@@ -38,33 +34,16 @@ struct MainCurrencyHeader: View {
         }
     }
 
-    private var picker: some View {
-        Menu {
-            ForEach(choices) { choice in
-                Button {
-                    onChoose(choice)
-                } label: {
-                    if choice == currency {
-                        Label("\(choice.name) (\(choice.code))", systemImage: "checkmark")
-                    } else {
-                        Text("\(choice.name) (\(choice.code))")
-                    }
-                }
-            }
-        } label: {
-            HStack(spacing: 8) {
-                FlagIcon(countryCode: currency.countryCode, diameter: 20)
-                Text(currency.name)
-                    .ledgerLabel()
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(Color.inkSecondary)
-            }
-            .frame(minHeight: 44)
-            .contentShape(.rect)
+    /// Flag and name, "US DOLLAR", above the amount.
+    private var nameLine: some View {
+        HStack(spacing: 8) {
+            FlagIcon(countryCode: currency.countryCode, diameter: 20)
+            Text(currency.name)
+                .ledgerLabel()
         }
+        .frame(minHeight: 44)
+        .accessibilityElement(children: .combine)
         .accessibilityLabel("Main currency: \(currency.name)")
-        .accessibilityHint("Choose a different main currency")
     }
 
     private var amountLine: some View {
@@ -107,10 +86,8 @@ struct MainCurrencyHeader: View {
 
     MainCurrencyHeader(
         currency: Currency(code: "USD", name: "US Dollar"),
-        choices: Currency.starterList,
         text: $amount,
-        focusedCode: $focusedCode,
-        onChoose: { _ in }
+        focusedCode: $focusedCode
     )
     .background(Color.paper)
 }
@@ -122,10 +99,8 @@ struct MainCurrencyHeader: View {
 
     MainCurrencyHeader(
         currency: Currency(code: "JOD", name: "Jordanian Dinar"),
-        choices: Currency.starterList,
         text: $amount,
-        focusedCode: $focusedCode,
-        onChoose: { _ in }
+        focusedCode: $focusedCode
     )
     .background(Color.paper)
 }
