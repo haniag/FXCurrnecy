@@ -9,8 +9,8 @@ import Foundation
 ///
 /// One GET returns every currency the service carries — hundreds of them,
 /// including crypto and metals — each quoted as units per 1 USD, which is
-/// already the shape the app works in. We keep the codes the user has on
-/// screen and drop the rest.
+/// already the shape the app works in. All of them are kept, not only the
+/// ones on screen, so the add sheet can show a rate for every currency.
 struct LiveRatesProvider: RatesProvider {
 
     // MARK: - Details to fill in
@@ -56,12 +56,12 @@ struct LiveRatesProvider: RatesProvider {
 
         let payload = try JSONDecoder().decode(Payload.self, from: data)
 
-        // The feed sends the whole world, so the filtering happens here rather
-        // than in the request. A code the feed doesn't carry is simply absent,
+        // The feed sends the whole world, and all of it is kept: the add sheet
+        // shows a rate beside every currency, and a newly added one has its
+        // rate straight away. A code the feed doesn't carry is simply absent,
         // and its row shows "—" rather than a wrong number.
-        let wanted = Set(codes)
         return RatesSnapshot(
-            rates: payload.rates.filter { wanted.contains($0.key) },
+            rates: payload.rates,
             quotedAt: Date(timeIntervalSince1970: Double(payload.timestamp) / 1000)
         )
     }

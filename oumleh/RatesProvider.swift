@@ -23,24 +23,23 @@ struct RatesSnapshot: Sendable, Codable {
 /// which service ends up behind it: swapping providers is a one-line change in
 /// `ContentView`, and the previews can hand over fixed numbers.
 protocol RatesProvider: Sendable {
-    /// Rates for the currencies asked for, as units per 1 USD.
+    /// Rates for at least the currencies asked for, as units per 1 USD.
     ///
-    /// The live service sends every currency it carries in one response, so
-    /// `codes` is what the provider keeps, not what it requests.
+    /// The live service sends every currency it carries in one response, and
+    /// the provider hands all of it back, so the add sheet can show rates for
+    /// currencies that aren't on the list yet.
     func rates(for codes: [String]) async throws -> RatesSnapshot
 }
 
 /// Stand-in used by previews and tests.
 ///
-/// Hands back the hand-entered figures from `Currency.sampleRates`, filtered to
-/// what was asked for. A currency that list doesn't carry is simply absent, so
-/// its row shows "—" rather than a wrong number.
+/// Hands back all the hand-entered figures from `Currency.sampleRates`, the
+/// way the live service hands back everything it carries. A currency that list
+/// doesn't carry is simply absent, so its row shows "—" rather than a wrong
+/// number.
 struct SampleRatesProvider: RatesProvider {
     func rates(for codes: [String]) async throws -> RatesSnapshot {
-        RatesSnapshot(
-            rates: Currency.sampleRates.filter { codes.contains($0.key) },
-            quotedAt: .now
-        )
+        RatesSnapshot(rates: Currency.sampleRates, quotedAt: .now)
     }
 }
 

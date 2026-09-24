@@ -94,12 +94,12 @@ final class ConverterViewModel {
 
     // MARK: - Refreshing
 
-    /// Fetch rates for exactly the currencies on screen.
+    /// Fetch fresh rates: at least the currencies on screen, and in practice
+    /// every one the service carries.
     ///
-    /// Called when the app starts and again whenever a currency is added, so a
-    /// new row gets a real rate instead of waiting for the next launch. The
-    /// codes are read at call time, which is what keeps the request in step with
-    /// the user's list.
+    /// Called when the app starts, on pull-to-refresh, and when the add sheet
+    /// closes with a currency that has no rate yet. The codes are read at call
+    /// time, which keeps the request in step with the user's list.
     func refreshRates() async {
         let codes = currencies.map(\.code)
         let previousStatus = status
