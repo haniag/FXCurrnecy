@@ -1,0 +1,11 @@
+# macOS folder settings
+.DS_Store
+
+# Xcode's per-user state (window layout, breakpoints) and build output
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+
+# The rates service key. Stays on this Mac only; see oumleh/Secrets.swift.
+oumleh/Secrets.swift
