@@ -157,8 +157,8 @@ final class ConverterViewModel {
 
     // MARK: - Amounts
 
-    /// Offered when a currency is selected. Quoting against 1 is the common
-    /// case, and it's also how a currency becomes the main one.
+    /// Offered when the amount field is selected, and where a new main currency
+    /// starts. Quoting against 1 is the common case.
     static let suggestedAmount: Decimal = 1
 
     /// The amount currently entered in the anchor row. An empty field is the
@@ -212,19 +212,15 @@ final class ConverterViewModel {
         untouchedAmount = nil   // from here the typed text is the truth
     }
 
-    /// A row lost focus, or the user tapped Done.
+    /// The amount field lost focus, or the user tapped Done.
     ///
-    /// An amount of exactly 1 is how the user picks a new main currency, so that
-    /// promotes the row to the top of the list.
+    /// Typing 1 used to be how a row became the main currency. Now the user
+    /// taps the row instead, and the only field is the main currency's own.
     func commitEditing(for currency: Currency) {
         guard currency.code == anchorCode else { return }
         let amount = anchorAmount
-        if amount == Self.suggestedAmount {
-            makeMain(currency)
-        } else {
-            anchorText = Self.editText(amount)   // tidy "0012" into "12"
-            untouchedAmount = amount             // keep precision the rounding would drop
-        }
+        anchorText = Self.editText(amount)   // tidy "0012" into "12", and "" into "1"
+        untouchedAmount = amount             // keep precision the rounding would drop
     }
 
     // MARK: - List changes
