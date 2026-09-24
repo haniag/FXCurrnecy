@@ -61,14 +61,13 @@ struct ContentView: View {
             .safeAreaInset(edge: .bottom) { statusFooter }
             // The rates for the user's currencies, fetched once on launch.
             .task { await model.refreshRates() }
-            .sheet(isPresented: $isAddingCurrency) {
+            .sheet(isPresented: $isAddingCurrency, onDismiss: refreshIfMissingRates) {
                 AddCurrencyView(
                     existingCodes: Set(model.currencies.map(\.code)),
-                    onAdd: { currency in
-                        model.add(currency)
-                        // The new currency wasn't in the last request, so ask again.
-                        Task { await model.refreshRates() }
-                    }
+                    mainCode: model.mainCode,
+                    rateText: { model.unitRateText(for: $0) },
+                    onAdd: { model.add($0) },
+                    onRemove: { model.remove($0) }
                 )
             }
         }
@@ -131,6 +130,14 @@ struct ContentView: View {
         } description: {
             Text("Tap + to add the currencies you want to convert.")
         }
+    }
+
+    /// Rates arrive for every currency at once, so a newly added one usually
+    /// has its rate already. Ask again only when one on the list still has none,
+    /// e.g. rates saved before the app kept them all.
+    private func refreshIfMissingRates() {
+        guard model.currencies.contains(where: { model.convertedAmount(for: $0) == nil }) else { return }
+        Task { await model.refreshRates() }
     }
 
     /// Move `currency` to the top, quoted at 1, with everything else converted
