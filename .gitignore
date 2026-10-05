@@ -7,5 +7,5 @@ xcuserdata/
 DerivedData/
 build/
 
-# The rates service key. Stays on this Mac only; see oumleh/Secrets.swift.
-oumleh/Secrets.swift
+# The rates service key. Stays on this Mac only; see FX/Secrets.swift.
+FX/Secrets.swift

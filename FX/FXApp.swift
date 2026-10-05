@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct oumlehApp: App {
+struct FXApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()

@@ -40,6 +40,15 @@ struct ContentView: View {
             }
             .background(Color.paper.ignoresSafeArea())
             .toolbar {
+                // How fresh the rates are, in the top bar beside the + button.
+                ToolbarItem(placement: .topBarLeading) {
+                    statusLine
+                        // Its full width on one line; the bar would squeeze it.
+                        .fixedSize()
+                }
+                // Plain text, not a glass button: there's nothing to tap.
+                .sharedBackgroundVisibility(.hidden)
+
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isAddingCurrency = true
@@ -56,7 +65,7 @@ struct ContentView: View {
                 }
             }
             .onChange(of: focusedCode, handleFocusChange)
-            .safeAreaInset(edge: .bottom) { statusFooter }
+            .safeAreaInset(edge: .bottom) { failureFooter }
             // The rates for the user's currencies, fetched once on launch.
             .task { await model.refreshRates() }
             .sheet(isPresented: $isAddingCurrency, onDismiss: refreshIfMissingRates) {
@@ -140,60 +149,64 @@ struct ContentView: View {
 
     /// Move `currency` to the top, quoted at 1, with everything else converted
     /// from it. What tapping a row does.
+    ///
+    /// The keyboard then opens on its amount, with "1" showing as the prompt:
+    /// the user can type a different amount, or tap Done and keep 1.
     private func makeMain(_ currency: Currency) {
         focusedCode = nil
         withAnimation(.snappy) { model.makeMain(currency) }
+        focusedCode = currency.code
     }
 
-    /// The bottom of the screen: how fresh the rates are, or why they aren't.
+    /// The top bar: how fresh the rates are, on one line.
     ///
     /// The list itself is never replaced by a spinner or an error. Adding,
     /// removing and reordering all work without a single rate, so taking the
     /// screen away over a failed fetch would cost more than it explains.
     @ViewBuilder
-    private var statusFooter: some View {
-        Group {
-            switch model.status {
-            case .loading:
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.mini)
-                    // A first run has nothing on screen to update yet.
-                    Text(model.hasRates ? "Updating rates…" : "Getting rates…")
-                }
+    private var statusLine: some View {
+        switch model.status {
+        case .loading:
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.mini)
+                // A first run has nothing on screen to update yet.
+                Text(model.hasRates ? "Updating rates…" : "Getting rates…")
+            }
+            .ledgerLabel()
+        case .loaded:
+            Text("Rates as of \(quotedAtText)")
                 .ledgerLabel()
-            case .loaded:
-                Text("Rates as of \(quotedAtText)")
-                    .ledgerLabel()
-            case .failed(let reason):
-                failureFooter(reason)
-            }
+        case .failed:
+            // The older time stays up, marked, so the rows don't read as current.
+            Label(model.hasRates ? "Rates as of \(quotedAtText)" : "No rates yet",
+                  systemImage: "exclamationmark.triangle")
+                // A toolbar shows icons alone by default; this needs the words.
+                .labelStyle(.titleAndIcon)
+                .ledgerLabel()
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        // Solid paper, so a row scrolling underneath can't show through the text.
-        .background(Color.paper)
     }
 
-    /// Why the refresh failed. Pulling the list down tries again, and with no
-    /// button for it the footer says so.
-    private func failureFooter(_ reason: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Label(reason, systemImage: "exclamationmark.triangle")
-
-            // Said plainly, because the rows above still show numbers and
-            // nothing else on screen marks them as old ones.
-            if model.hasRates {
-                Text("Showing rates from \(quotedAtText).")
+    /// Why the refresh failed, at the bottom, only while it has. Too long for
+    /// the top bar, and pulling the list down tries again, which with no button
+    /// for it the footer has to say.
+    @ViewBuilder
+    private var failureFooter: some View {
+        if case .failed(let reason) = model.status {
+            VStack(alignment: .leading, spacing: 4) {
+                Label(reason, systemImage: "exclamationmark.triangle")
+                Text("Pull down to try again.")
             }
-
-            Text("Pull down to try again.")
+            .font(.footnote)
+            .foregroundStyle(Color.inkSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            // Solid paper, so a row scrolling underneath can't show through the text.
+            .background(Color.paper)
         }
-        .font(.footnote)
-        .foregroundStyle(Color.inkSecondary)
     }
 
-    /// The quote time as the footer shows it: the time alone when the rates were
+    /// The quote time as the top bar shows it: the time alone when the rates were
     /// struck today, date and time when they weren't. The feed's timestamp can
     /// be hours or days old, and a bare "15:03" would read as this afternoon.
     private var quotedAtText: String {
@@ -255,8 +268,8 @@ struct ContentView: View {
     ))
 }
 
-/// A failure with yesterday's rates still on screen: the footer has to say so,
-/// or the numbers above read as current.
+/// A failure with yesterday's rates still on screen: the top bar has to say so,
+/// or the numbers below read as current.
 #Preview("Failed, older rates on screen") {
     ContentView(model: ConverterViewModel(
         store: .ephemeral(

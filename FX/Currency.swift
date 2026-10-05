@@ -31,9 +31,10 @@ extension Currency {
 // Both of these go away once the Xe API is in.
 
 extension Currency {
-    /// The list the app starts with. Names come from the catalogue so they match
-    /// everything shown in the "add currency" sheet.
-    static let starterList: [Currency] = ["USD", "ILS", "GBP", "EUR", "JOD", "TRY"]
+    /// The list the app starts with. The first entry is the main currency, so
+    /// USD is the default main with EUR and GBP below it. Names come from the
+    /// catalogue so they match everything shown in the "add currency" sheet.
+    static let starterList: [Currency] = ["USD", "EUR", "GBP"]
         .compactMap(CurrencyCatalog.currency(for:))
 
     /// Units of each currency per 1 USD.

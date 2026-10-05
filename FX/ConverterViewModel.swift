@@ -74,7 +74,7 @@ final class ConverterViewModel {
         self.store = store
         self.ratesProvider = ratesProvider
 
-        // The user's own list, or the starter six the very first time. Held in
+        // The user's own list, or the starter list the very first time. Held in
         // a local as well, because the anchor below is read before every
         // stored property is in place and `self` isn't usable until then.
         let list = store.loadCurrencies() ?? Currency.starterList

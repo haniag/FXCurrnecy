@@ -29,7 +29,7 @@ extension Color {
     /// The screen behind everything: warm paper rather than white.
     static let paper = Color(hex: 0xF4F1E8)
 
-    /// Text, and the heavy rule under the main currency.
+    /// Text.
     static let ink = Color(hex: 0x1A1916)
 
     /// Names, captions and small labels. Still dark enough to read at small
@@ -39,7 +39,8 @@ extension Color {
     /// The thin lines between rows.
     static let hairline = Color(hex: 0x1A1916).opacity(0.14)
 
-    /// The design's one accent: the checkmarks in the add sheet.
+    /// The design's one accent: the edge of the main currency's row, and the
+    /// checkmarks in the add sheet.
     static let terracotta = Color(hex: 0xB4462B)
 }
 
@@ -50,12 +51,6 @@ extension Color {
 // keep amounts from shifting sideways as they change.
 
 extension Font {
-    /// The main currency's amount and code, "1 USD", in SF Mono Bold. The size
-    /// is a parameter because the line shrinks to fit a long amount on one line.
-    static func headerAmount(size: CGFloat = 50) -> Font {
-        .system(size: size, weight: .bold, design: .monospaced)
-    }
-
     /// A row's converted amount.
     static let rowAmount = Font.system(size: 25, weight: .bold, design: .monospaced)
 
@@ -67,8 +62,7 @@ extension Font {
 }
 
 extension View {
-    /// Small spaced capitals: "RATES AS OF 15:03", and the main currency's
-    /// name above its amount.
+    /// Small spaced capitals: "RATES AS OF 15:03".
     func ledgerLabel() -> some View {
         font(.caption2.weight(.semibold))
             .tracking(1.3)

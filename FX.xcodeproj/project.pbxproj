@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		37E1019D3061B0EC00734336 /* oumleh.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = oumleh.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37E1019D3061B0EC00734336 /* FX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		37E1019F3061B0EC00734336 /* oumleh */ = {
+		37E1019F3061B0EC00734336 /* FX */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = oumleh;
+			path = FX;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -30,7 +30,7 @@
 		37E101943061B0EC00734336 = {
 			isa = PBXGroup;
 			children = (
-				37E1019F3061B0EC00734336 /* oumleh */,
+				37E1019F3061B0EC00734336 /* FX */,
 				37E1019E3061B0EC00734336 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -38,7 +38,7 @@
 		37E1019E3061B0EC00734336 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				37E1019D3061B0EC00734336 /* oumleh.app */,
+				37E1019D3061B0EC00734336 /* FX.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -46,9 +46,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		37E1019C3061B0EC00734336 /* oumleh */ = {
+		37E1019C3061B0EC00734336 /* FX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 37E101A83061B0ED00734336 /* Build configuration list for PBXNativeTarget "oumleh" */;
+			buildConfigurationList = 37E101A83061B0ED00734336 /* Build configuration list for PBXNativeTarget "FX" */;
 			buildPhases = (
 				37E101993061B0EC00734336 /* Sources */,
 				37E1019A3061B0EC00734336 /* Frameworks */,
@@ -57,11 +57,11 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				37E1019F3061B0EC00734336 /* oumleh */,
+				37E1019F3061B0EC00734336 /* FX */,
 			);
-			name = oumleh;
+			name = FX;
 			productName = oumleh;
-			productReference = 37E1019D3061B0EC00734336 /* oumleh.app */;
+			productReference = 37E1019D3061B0EC00734336 /* FX.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -79,7 +79,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 37E101983061B0EC00734336 /* Build configuration list for PBXProject "oumleh" */;
+			buildConfigurationList = 37E101983061B0EC00734336 /* Build configuration list for PBXProject "FX" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -93,7 +93,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				37E1019C3061B0EC00734336 /* oumleh */,
+				37E1019C3061B0EC00734336 /* FX */,
 			);
 		};
 /* End PBXProject section */
@@ -115,7 +115,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		37E101A63061B0ED00734336 /* Debug configuration for PBXProject "oumleh" */ = {
+		37E101A63061B0ED00734336 /* Debug configuration for PBXProject "FX" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -179,7 +179,7 @@
 			};
 			name = Debug;
 		};
-		37E101A73061B0ED00734336 /* Release configuration for PBXProject "oumleh" */ = {
+		37E101A73061B0ED00734336 /* Release configuration for PBXProject "FX" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -236,11 +236,12 @@
 			};
 			name = Release;
 		};
-		37E101A93061B0ED00734336 /* Debug configuration for PBXNativeTarget "oumleh" */ = {
+		37E101A93061B0ED00734336 /* Debug configuration for PBXNativeTarget "FX" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6GBM8GTKU5;
@@ -258,8 +259,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.oumleh;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.fx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -274,11 +276,12 @@
 			};
 			name = Debug;
 		};
-		37E101AA3061B0ED00734336 /* Release configuration for PBXNativeTarget "oumleh" */ = {
+		37E101AA3061B0ED00734336 /* Release configuration for PBXNativeTarget "FX" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6GBM8GTKU5;
@@ -296,8 +299,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.oumleh;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.fx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -315,19 +319,19 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		37E101983061B0EC00734336 /* Build configuration list for PBXProject "oumleh" */ = {
+		37E101983061B0EC00734336 /* Build configuration list for PBXProject "FX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				37E101A63061B0ED00734336 /* Debug configuration for PBXProject "oumleh" */,
-				37E101A73061B0ED00734336 /* Release configuration for PBXProject "oumleh" */,
+				37E101A63061B0ED00734336 /* Debug configuration for PBXProject "FX" */,
+				37E101A73061B0ED00734336 /* Release configuration for PBXProject "FX" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		37E101A83061B0ED00734336 /* Build configuration list for PBXNativeTarget "oumleh" */ = {
+		37E101A83061B0ED00734336 /* Build configuration list for PBXNativeTarget "FX" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				37E101A93061B0ED00734336 /* Debug configuration for PBXNativeTarget "oumleh" */,
-				37E101AA3061B0ED00734336 /* Release configuration for PBXNativeTarget "oumleh" */,
+				37E101A93061B0ED00734336 /* Debug configuration for PBXNativeTarget "FX" */,
+				37E101AA3061B0ED00734336 /* Release configuration for PBXNativeTarget "FX" */,
 			);
 			defaultConfigurationName = Release;
 		};
