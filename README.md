@@ -1,3 +1,5 @@
+## FX Currency
+
 - I was looking for a simple, private, and fast currency conversion app!
 - Build using Claude Code in 30 minutes.
 
