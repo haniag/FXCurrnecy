@@ -4,3 +4,7 @@
 - Build using Claude Code in 30 minutes.
 
 <img width="563" height="1218" alt="IMG_3171" src="https://github.com/user-attachments/assets/1ef40ad6-e1e1-4ca3-9a63-bc7a4d273719" />
+
+
+Copyright © 2026 Hani Abughazaleh. All rights reserved.
+This code is shared for viewing purposes only. No permission is granted to use, copy, modify, distribute, or create derivative works from it.
