@@ -13,8 +13,8 @@ struct ContentView: View {
     @State private var model: ConverterViewModel
     @State private var isAddingCurrency = false
     @FocusState private var focusedCode: String?
-    /// Bumped after every drag. See the `.id` on the List below.
-    @State private var orderVersion = 0
+    /// Bumped after every drag and swipe-delete. See the `.id` on the List below.
+    @State private var listVersion = 0
 
     /// The app builds its own model: the saved list from `SettingsStore`, and
     /// live rates from `LiveRatesProvider` — which stays quiet until its
@@ -110,16 +110,18 @@ struct ContentView: View {
             // one less than the same currency's place in the full list.
             .onMove { from, to in
                 model.move(from: IndexSet(from.map { $0 + 1 }), to: to + 1)
-                orderVersion += 1
+                listVersion += 1
             }
             .onDelete { offsets in
                 model.remove(at: IndexSet(offsets.map { $0 + 1 }))
+                listVersion += 1
             }
         }
-        // Rebuilt from scratch after each drag. List applies a drop to its
-        // own rows AND again when our array changes, landing one position
-        // out; a new identity throws those rows away and re-reads the array.
-        .id(orderVersion)
+        // Rebuilt from scratch after each drag or swipe-delete. List applies
+        // the change to its own rows AND again when our array changes, landing
+        // one position out (a delete drops the next row too and repeats the
+        // last); a new identity throws those rows away and re-reads the array.
+        .id(listVersion)
         // iOS 26: softens the rows as they pass under the footer.
         .scrollEdgeEffectStyle(.soft, for: .bottom)
         .listStyle(.plain)
