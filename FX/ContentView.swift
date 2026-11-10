@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  oumleh
+//  FX
 //
 //  Created by hani on 9/21/26.
 //
@@ -15,6 +15,22 @@ struct ContentView: View {
     @FocusState private var focusedCode: String?
     /// Bumped after every drag and swipe-delete. See the `.id` on the List below.
     @State private var listVersion = 0
+    /// The short message at the bottom after a copy or a delete.
+    @State private var notice: Notice?
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// What the bottom of the screen has to say for a few seconds.
+    private struct Notice: Identifiable, Equatable {
+        enum Kind: Equatable {
+            /// An amount went to the clipboard: "3.012 ILS".
+            case copied(String)
+            /// A row was swiped away, and where it was, so it can be put back.
+            case removed(Currency, index: Int)
+        }
+
+        let id = UUID()
+        let kind: Kind
+    }
 
     /// The app builds its own model: the saved list from `SettingsStore`, and
     /// live rates from `LiveRatesProvider` — which stays quiet until its
@@ -65,9 +81,29 @@ struct ContentView: View {
                 }
             }
             .onChange(of: focusedCode, handleFocusChange)
-            .safeAreaInset(edge: .bottom) { failureFooter }
-            // The rates for the user's currencies, fetched once on launch.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                VStack(spacing: 0) {
+                    noticeBanner
+                    failureFooter
+                }
+            }
+            // The rates for the user's currencies, fetched on launch…
             .task { await model.refreshRates() }
+            // …and again on coming back to the app, once they've had time to
+            // go stale. Left open overnight, it would otherwise show
+            // yesterday's figures until pulled.
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active else { return }
+                Task { await model.refreshIfStale() }
+            }
+            // The message clears itself; a newer one restarts the clock.
+            .task(id: notice?.id) {
+                guard notice != nil else { return }
+                try? await Task.sleep(for: .seconds(4))
+                guard !Task.isCancelled else { return }
+                withAnimation(.snappy) { notice = nil }
+            }
+            .sensoryFeedback(.success, trigger: notice?.id) { _, new in new != nil }
             .sheet(isPresented: $isAddingCurrency, onDismiss: refreshIfMissingRates) {
                 AddCurrencyView(
                     existingCodes: Set(model.currencies.map(\.code)),
@@ -79,6 +115,9 @@ struct ContentView: View {
             }
         }
         .tint(Color.ink)
+        // Text follows the user's size setting, up to the point where a row
+        // can no longer hold a name and an amount side by side.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         // The design's colours are pinned light, so the system's parts (the
         // status bar, the keyboard, menus) are kept light to match. In dark
         // mode they'd otherwise turn dark around a light screen.
@@ -86,7 +125,8 @@ struct ContentView: View {
     }
 
     /// Every currency but the main one. Tapping a row makes it the main one;
-    /// a long press drags it to a new place; a swipe deletes it.
+    /// a long press drags it to a new place; a swipe to the left deletes it,
+    /// and a swipe to the right copies its amount.
     private var list: some View {
         List {
             ForEach(model.otherCurrencies) { currency in
@@ -101,6 +141,26 @@ struct ContentView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityHint("Makes \(currency.name) the main currency")
+                // Both swipes are spelled out. Adding any swipe action switches
+                // off the delete that `onDelete` would otherwise provide.
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        remove(currency)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+                .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                    // Nothing to copy from a row still showing "—".
+                    if let text = model.copyText(for: currency) {
+                        Button {
+                            copy(text, of: currency)
+                        } label: {
+                            Label("Copy", systemImage: "doc.on.doc")
+                        }
+                        .tint(Color.ink)
+                    }
+                }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
                 .listRowSeparatorTint(Color.hairline)
@@ -110,10 +170,6 @@ struct ContentView: View {
             // one less than the same currency's place in the full list.
             .onMove { from, to in
                 model.move(from: IndexSet(from.map { $0 + 1 }), to: to + 1)
-                listVersion += 1
-            }
-            .onDelete { offsets in
-                model.remove(at: IndexSet(offsets.map { $0 + 1 }))
                 listVersion += 1
             }
         }
@@ -130,6 +186,27 @@ struct ContentView: View {
         .scrollDismissesKeyboard(.interactively)
         // Pulling down is the only way to refresh; there's no button for it.
         .refreshable { await model.refreshRates() }
+    }
+
+    /// Swipe-delete. The row's place is noted first, so "Undo" can put it back
+    /// exactly where it was.
+    private func remove(_ currency: Currency) {
+        guard let index = model.currencies.firstIndex(of: currency) else { return }
+        model.remove(currency)
+        listVersion += 1
+        withAnimation(.snappy) { notice = Notice(kind: .removed(currency, index: index)) }
+    }
+
+    private func undoRemove(_ currency: Currency, at index: Int) {
+        model.restore(currency, at: index)
+        listVersion += 1
+        withAnimation(.snappy) { notice = nil }
+    }
+
+    /// Put a row's amount on the clipboard as a plain number, and say so.
+    private func copy(_ text: String, of currency: Currency) {
+        UIPasteboard.general.string = text
+        withAnimation(.snappy) { notice = Notice(kind: .copied("\(text) \(currency.code)")) }
     }
 
     /// Only reachable by removing every currency.
@@ -208,6 +285,37 @@ struct ContentView: View {
         }
     }
 
+    /// Confirms a copy, or offers to take back a delete, for a few seconds.
+    /// A strip of ink across the paper, so it can't be mistaken for a row.
+    @ViewBuilder
+    private var noticeBanner: some View {
+        if let notice {
+            HStack(spacing: 12) {
+                switch notice.kind {
+                case .copied(let what):
+                    Label("Copied \(what)", systemImage: "doc.on.doc")
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                case .removed(let currency, let index):
+                    Text("Removed \(currency.name)")
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                    Button("Undo") { undoRemove(currency, at: index) }
+                        .fontWeight(.bold)
+                        .underline()
+                }
+            }
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(Color.paper)
+            .tint(Color.paper)
+            .padding(.horizontal, 20)
+            .frame(minHeight: 46)
+            .frame(maxWidth: .infinity)
+            .background(Color.ink)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+    }
+
     /// The quote time as the top bar shows it: the time alone when the rates were
     /// struck today, date and time when they weren't. The feed's timestamp can
     /// be hours or days old, and a bare "15:03" would read as this afternoon.
@@ -240,6 +348,8 @@ struct ContentView: View {
         }
     }
 }
+
+#if DEBUG
 
 // MARK: - Previews
 
@@ -284,3 +394,5 @@ struct ContentView: View {
         ratesProvider: FailingRatesProvider(error: .badStatus(401))
     ))
 }
+
+#endif

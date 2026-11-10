@@ -1,6 +1,6 @@
 //
 //  FlagIcon.swift
-//  oumleh
+//  FX
 //
 
 import SwiftUI
@@ -16,7 +16,7 @@ import SwiftUI
 /// Each flag keeps its natural 7:5 proportion and is cropped to a circle — the
 /// same trick circular flag icon sets use.
 struct FlagIcon: View {
-    let countryCode: String
+    let currency: Currency
     var diameter: CGFloat = 25
 
     var body: some View {
@@ -31,23 +31,28 @@ struct FlagIcon: View {
 
     @ViewBuilder
     private var flag: some View {
-        if hasFlag {
-            Image(countryCode)
+        if let flagName {
+            Image(flagName)
                 .resizable()
                 // Fills the circle, trimming the left and right edges rather
                 // than letterboxing a 7:5 flag into a square.
                 .scaledToFill()
         } else {
-            NeutralFlag(code: countryCode)
+            NeutralFlag(code: currency.code)
         }
     }
 
-    /// False for currencies with no country behind them — the metals ("XAU"),
-    /// the IMF's "XDR", the shared regional codes ("XOF") — which get a badge.
-    private var hasFlag: Bool { UIImage(named: countryCode) != nil }
+    /// Nil for currencies with no country behind them — the metals ("XAU"),
+    /// the IMF's "XDR", the shared regional codes ("XOF") — and for a country
+    /// there's no artwork for. Those get a badge.
+    private var flagName: String? {
+        guard let country = currency.countryCode, UIImage(named: country) != nil else { return nil }
+        return country
+    }
 }
 
-/// Fallback for currencies that aren't country based.
+/// Fallback for currencies that aren't country based: the currency's own
+/// code, in full, so gold ("XAU") and silver ("XAG") don't both read "XA".
 private struct NeutralFlag: View {
     let code: String
 
@@ -56,27 +61,38 @@ private struct NeutralFlag: View {
             ZStack {
                 Color(.systemGray3)
                 Text(code)
-                    .font(.system(size: geo.size.height * 0.38, weight: .bold))
+                    // Three letters across the circle, with room either side.
+                    .font(.system(size: geo.size.height * 0.3, weight: .bold))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding(.horizontal, geo.size.width * 0.08)
             }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
     }
 }
+
+#if DEBUG
 
 #Preview("Flags") {
     VStack(spacing: 20) {
         HStack(spacing: 16) {
             ForEach(Currency.starterList) { currency in
-                FlagIcon(countryCode: currency.countryCode)
+                FlagIcon(currency: currency)
             }
-            FlagIcon(countryCode: "ZZ")   // no such country: the fallback badge
+            // No country behind these: the badge, with the full code.
+            FlagIcon(currency: Currency(code: "XAU", name: "Gold Ounce"))
+            FlagIcon(currency: Currency(code: "BTC", name: "Bitcoin"))
         }
         // Larger, to check the vectors stay sharp when scaled up.
         HStack(spacing: 16) {
             ForEach(Currency.starterList) { currency in
-                FlagIcon(countryCode: currency.countryCode, diameter: 84)
+                FlagIcon(currency: currency, diameter: 84)
             }
         }
     }
     .padding()
 }
+
+#endif

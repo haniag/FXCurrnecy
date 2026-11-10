@@ -1,6 +1,6 @@
 //
-//  oumlehApp.swift
-//  oumleh
+//  FXApp.swift
+//  FX
 //
 //  Created by hani on 9/21/26.
 //

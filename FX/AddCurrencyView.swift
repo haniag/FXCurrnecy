@@ -1,6 +1,6 @@
 //
 //  AddCurrencyView.swift
-//  oumleh
+//  FX
 //
 
 import SwiftUI
@@ -8,8 +8,9 @@ import SwiftUI
 /// The sheet behind the "+" button: a checklist of every currency. Tap one to
 /// add it to the main screen, tap it again to take it off.
 ///
-/// The list comes from Xe, so it only ever offers currencies Xe can actually
-/// quote a rate for.
+/// The list comes from Xe, so it offers the currencies Xe can actually quote
+/// a rate for. `XeCurrencyService` keeps a saved copy, so the sheet opens
+/// without waiting and works offline.
 struct AddCurrencyView: View {
     /// Codes on the main screen right now. Fresh each time the list changes,
     /// since the sheet is redrawn with the screen behind it.
@@ -46,7 +47,7 @@ struct AddCurrencyView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 Text("Add a currency")
-                    .font(.system(size: 32, weight: .semibold))
+                    .ledgerFont(.sheetTitle)
                     .padding(.horizontal, 20)
 
                 searchField
@@ -156,7 +157,8 @@ struct AddCurrencyView: View {
         return currencies.filter {
             $0.code.localizedCaseInsensitiveContains(query)
                 || $0.name.localizedCaseInsensitiveContains(query)
-                || (Locale.current.localizedString(forRegionCode: $0.countryCode)?
+                || ($0.countryCode
+                    .flatMap { Locale.current.localizedString(forRegionCode: $0) }?
                     .localizedCaseInsensitiveContains(query) ?? false)
         }
     }
@@ -190,12 +192,12 @@ struct AddCurrencyView: View {
             if isOnList { onRemove(currency) } else { onAdd(currency) }
         } label: {
             HStack(spacing: 14) {
-                FlagIcon(countryCode: currency.countryCode, diameter: 28)
+                FlagIcon(currency: currency, diameter: 28)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(currency.code)
-                        .font(.rowCode)
                         .tracking(0.8)
+                        .ledgerFont(.rowCode)
                     Text(isOnList ? "\(currency.name) · On your list" : currency.name)
                         .font(.footnote)
                         .foregroundStyle(Color.inkSecondary)
@@ -206,7 +208,7 @@ struct AddCurrencyView: View {
 
                 if let rate = rateText(currency) {
                     Text(rate)
-                        .font(.listRate)
+                        .ledgerFont(.listRate)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                 }
@@ -278,6 +280,8 @@ private struct ToggleMark: View {
     }
 }
 
+#if DEBUG
+
 // MARK: - Previews
 
 /// Stand-in rows, so the previews don't depend on the network being up.
@@ -297,7 +301,7 @@ private let sampleCurrencies = [
 
 /// Sample rates against 1 USD, formatted the way the app formats them.
 private func sampleRate(_ currency: Currency) -> String? {
-    Currency.sampleRates[currency.code].map(ConverterViewModel.rateText)
+    Currency.sampleRates[currency.code].map { NumberText.rateText($0) }
 }
 
 #Preview("Loaded") {
@@ -330,3 +334,5 @@ private func sampleRate(_ currency: Currency) -> String? {
 #Preview("Live") {
     AddCurrencyView(existingCodes: ["USD"], mainCode: "USD", onAdd: { _ in }, onRemove: { _ in })
 }
+
+#endif

@@ -1,11 +1,12 @@
 //
 //  ConverterViewModel.swift
-//  oumleh
+//  FX
 //
 
 import Foundation
 import Observation
 import SwiftUI  // for move(fromOffsets:toOffset:) and remove(atOffsets:)
+import WidgetKit
 
 /// Holds the user's currency list and converts between them.
 ///
@@ -24,7 +25,10 @@ final class ConverterViewModel {
     /// reordering and promoting a main currency all end up assigning here, and
     /// a single hook is one that can't be forgotten.
     private(set) var currencies: [Currency] {
-        didSet { store.save(currencies: currencies) }
+        didSet {
+            store.save(currencies: currencies)
+            reloadWidgets()
+        }
     }
 
     /// Units of each currency per 1 USD.
@@ -69,10 +73,24 @@ final class ConverterViewModel {
     private let ratesProvider: RatesProvider
     private let store: SettingsStore
 
+    /// When this launch last fetched rates successfully. Not `quotedAt`: the
+    /// feed's own timestamp can be hours old straight after a fetch, and going
+    /// by it would have the app asking again every time it came forward.
+    private var lastFetchedAt: Date?
+
+    /// How old a fetch may be before coming back to the app asks for another.
+    static let staleAfter: TimeInterval = 5 * 60
+
+    /// Tells the home-screen widget its figures have changed. It reads the
+    /// same saved list and rates, and only redraws when asked.
+    private let reloadWidgets: () -> Void
+
     init(store: SettingsStore = SettingsStore(),
-         ratesProvider: RatesProvider = SampleRatesProvider()) {
+         ratesProvider: RatesProvider,
+         reloadWidgets: @escaping () -> Void = { WidgetCenter.shared.reloadAllTimelines() }) {
         self.store = store
         self.ratesProvider = ratesProvider
+        self.reloadWidgets = reloadWidgets
 
         // The user's own list, or the starter list the very first time. Held in
         // a local as well, because the anchor below is read before every
@@ -112,8 +130,10 @@ final class ConverterViewModel {
             rates = snapshot.rates
             quotedAt = snapshot.quotedAt
             status = .loaded
+            lastFetchedAt = .now
             // Kept for next launch, so the app opens on these rather than "—".
             store.save(snapshot: snapshot)
+            reloadWidgets()
         } catch {
             // A cancelled refresh isn't a failure worth reporting: the screen
             // went away, or the user let go of the pull part-way.
@@ -121,6 +141,18 @@ final class ConverterViewModel {
             // The rates already on screen stay put; only the status changes.
             status = .failed(error.localizedDescription)
         }
+    }
+
+    /// Fetch again if the rates on screen have had time to go stale. Called
+    /// when the app comes back to the front: left open overnight, it would
+    /// otherwise show yesterday's figures until the user thought to pull.
+    ///
+    /// Does nothing while a fetch is already running, which covers launch,
+    /// where the screen's own first fetch has just started.
+    func refreshIfStale(now: Date = .now) async {
+        guard status != .loading else { return }
+        if let lastFetchedAt, now.timeIntervalSince(lastFetchedAt) < Self.staleAfter { return }
+        await refreshRates()
     }
 
     /// The main currency: the one at the top of the list that everything is quoted against.
@@ -143,7 +175,7 @@ final class ConverterViewModel {
               let rate = rates[currency.code], rate != 0,
               let main = rates[mainCode]
         else { return nil }
-        return "1 \(currency.code) = \(Self.rateText(main / rate)) \(mainCode)"
+        return "1 \(currency.code) = \(NumberText.rateText(main / rate)) \(mainCode)"
     }
 
     /// One of the main currency in `currency`, e.g. "3.673", for the rate
@@ -152,7 +184,7 @@ final class ConverterViewModel {
         guard let rate = rates[currency.code],
               let main = rates[mainCode], main != 0
         else { return nil }
-        return Self.rateText(rate / main)
+        return NumberText.rateText(rate / main)
     }
 
     // MARK: - Amounts
@@ -166,7 +198,7 @@ final class ConverterViewModel {
     var anchorAmount: Decimal {
         if let untouchedAmount { return untouchedAmount }
         if anchorText.isEmpty { return Self.suggestedAmount }
-        return Self.parse(anchorText) ?? 0
+        return NumberText.parse(anchorText) ?? 0
     }
 
     /// What a row should show: the raw text for the row being typed into, and a
@@ -174,7 +206,13 @@ final class ConverterViewModel {
     func displayText(for currency: Currency) -> String {
         if currency.code == anchorCode { return anchorText }
         guard let amount = convertedAmount(for: currency) else { return "—" }
-        return Self.displayText(amount)
+        return NumberText.displayText(amount)
+    }
+
+    /// A row's amount as plain text for the clipboard: no grouping, so it
+    /// pastes into a calculator or a bank form as a number. Nil with no rate.
+    func copyText(for currency: Currency) -> String? {
+        convertedAmount(for: currency).map { NumberText.editText($0) }
     }
 
     /// The anchor amount expressed in `currency`.
@@ -201,7 +239,7 @@ final class ConverterViewModel {
 
     /// A keystroke landed in a row.
     func updateText(_ newText: String, for currency: Currency) {
-        let sanitized = Self.sanitize(newText)
+        let sanitized = NumberText.sanitize(newText)
         // SwiftUI writes a field's own value back to its binding when the field
         // takes focus. That isn't the user typing, and acting on it would throw
         // away the exact amount sitting behind the rounded text.
@@ -219,7 +257,7 @@ final class ConverterViewModel {
     func commitEditing(for currency: Currency) {
         guard currency.code == anchorCode else { return }
         let amount = anchorAmount
-        anchorText = Self.editText(amount)   // tidy "0012" into "12", and "" into "1"
+        anchorText = NumberText.editText(amount)   // tidy "0012" into "12", and "" into "1"
         untouchedAmount = amount             // keep precision the rounding would drop
     }
 
@@ -252,6 +290,13 @@ final class ConverterViewModel {
         remove(at: IndexSet(integer: index))
     }
 
+    /// Put back a currency that was just removed, where it was. What the
+    /// "Undo" after a swipe-delete does.
+    func restore(_ currency: Currency, at index: Int) {
+        guard !currencies.contains(where: { $0.code == currency.code }) else { return }
+        currencies.insert(currency, at: min(max(index, 0), currencies.count))
+    }
+
     func remove(at offsets: IndexSet) {
         let removingAnchor = offsets.contains { currencies[$0].code == anchorCode }
         currencies.remove(atOffsets: offsets)
@@ -259,71 +304,5 @@ final class ConverterViewModel {
         if removingAnchor, let main = currencies.first {
             makeMain(main)
         }
-    }
-
-    // MARK: - Number text
-
-    private static let decimalSeparator = Locale.current.decimalSeparator ?? "."
-    private static let groupingSeparator = Locale.current.groupingSeparator ?? ","
-
-    /// Keep digits and at most one decimal separator.
-    static func sanitize(_ text: String) -> String {
-        var result = ""
-        var hasSeparator = false
-        for character in text.replacingOccurrences(of: groupingSeparator, with: "") {
-            if character.isNumber {
-                result.append(character)
-            } else if character == "." || character == "," , !hasSeparator {
-                hasSeparator = true
-                result.append(decimalSeparator)
-            }
-        }
-        return result
-    }
-
-    static func parse(_ text: String) -> Decimal? {
-        let normalized = text
-            .replacingOccurrences(of: groupingSeparator, with: "")
-            .replacingOccurrences(of: decimalSeparator, with: ".")
-        return Decimal(string: normalized)
-    }
-
-    /// For rows the user isn't editing: grouped, e.g. "1,234.5".
-    static func displayText(_ amount: Decimal) -> String {
-        displayFormatter.string(from: amount as NSDecimalNumber) ?? "0"
-    }
-
-    /// For the row the user is editing: no grouping, so it stays re-parseable.
-    static func editText(_ amount: Decimal) -> String {
-        editFormatter.string(from: amount as NSDecimalNumber) ?? "0"
-    }
-
-    /// For rates rather than amounts. Up to 3 decimal places like everything
-    /// else, except below 1, where 3 significant digits stop a small rate from
-    /// rounding away: 1 TRY shows as 0.0205 USD rather than 0.02, and 1 LBP
-    /// as 0.0000112 rather than 0.
-    static func rateText(_ rate: Decimal) -> String {
-        let formatter = rate < 1 ? smallRateFormatter : displayFormatter
-        return formatter.string(from: rate as NSDecimalNumber) ?? "0"
-    }
-
-    private static let displayFormatter = makeFormatter(grouping: true)
-    private static let editFormatter = makeFormatter(grouping: false)
-
-    private static let smallRateFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.usesSignificantDigits = true
-        formatter.maximumSignificantDigits = 3
-        return formatter
-    }()
-
-    private static func makeFormatter(grouping: Bool) -> NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = 3
-        formatter.usesGroupingSeparator = grouping
-        return formatter
     }
 }

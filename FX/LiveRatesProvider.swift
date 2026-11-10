@@ -1,6 +1,6 @@
 //
 //  LiveRatesProvider.swift
-//  oumleh
+//  FX
 //
 
 import Foundation
@@ -22,8 +22,6 @@ struct LiveRatesProvider: RatesProvider {
     /// The GET endpoint that returns the rates.
     ///
     ///     var endpoint: URL? = URL(string: "https://rates.example.com/v1/latest")
-    
-     //var endpoint: URL? = nil
     var endpoint: URL? = URL(string: "https://www.xe.com/api/protected/midmarket-converter")
 
     /// The key, sent as the `Authorization` header with its scheme included

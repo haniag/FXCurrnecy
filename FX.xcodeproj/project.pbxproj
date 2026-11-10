@@ -6,9 +6,56 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		37F2000F3061B0EC00734336 /* FXWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 37F200043061B0EC00734336 /* FXWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		37F200103061B0EC00734336 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37E101953061B0EC00734336 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37F200063061B0EC00734336;
+			remoteInfo = FXWidgetExtension;
+		};
+		37F200123061B0EC00734336 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 37E101953061B0EC00734336 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 37E1019C3061B0EC00734336;
+			remoteInfo = FX;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		37F2000E3061B0EC00734336 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				37F2000F3061B0EC00734336 /* FXWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		37E1019D3061B0EC00734336 /* FX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		37F200043061B0EC00734336 /* FXWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FXWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		37F200053061B0EC00734336 /* FXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FXTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		37F200143061B0EC00734336 /* Exceptions for "FXWidget" folder in "FXWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 37F200063061B0EC00734336 /* FXWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		37E1019F3061B0EC00734336 /* FX */ = {
@@ -16,10 +63,38 @@
 			path = FX;
 			sourceTree = "<group>";
 		};
+		37F200013061B0EC00734336 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		37F200023061B0EC00734336 /* FXWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				37F200143061B0EC00734336 /* Exceptions for "FXWidget" folder in "FXWidgetExtension" target */,
+			);
+			path = FXWidget;
+			sourceTree = "<group>";
+		};
+		37F200033061B0EC00734336 /* FXTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FXTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		37E1019A3061B0EC00734336 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		37F200093061B0EC00734336 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		37F2000C3061B0EC00734336 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -31,6 +106,9 @@
 			isa = PBXGroup;
 			children = (
 				37E1019F3061B0EC00734336 /* FX */,
+				37F200013061B0EC00734336 /* Shared */,
+				37F200023061B0EC00734336 /* FXWidget */,
+				37F200033061B0EC00734336 /* FXTests */,
 				37E1019E3061B0EC00734336 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -39,6 +117,8 @@
 			isa = PBXGroup;
 			children = (
 				37E1019D3061B0EC00734336 /* FX.app */,
+				37F200043061B0EC00734336 /* FXWidgetExtension.appex */,
+				37F200053061B0EC00734336 /* FXTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -53,16 +133,61 @@
 				37E101993061B0EC00734336 /* Sources */,
 				37E1019A3061B0EC00734336 /* Frameworks */,
 				37E1019B3061B0EC00734336 /* Resources */,
+				37F2000E3061B0EC00734336 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
+			dependencies = (
+				37F200113061B0EC00734336 /* PBXTargetDependency */,
+			);
 			fileSystemSynchronizedGroups = (
 				37E1019F3061B0EC00734336 /* FX */,
+				37F200013061B0EC00734336 /* Shared */,
 			);
 			name = FX;
 			productName = oumleh;
 			productReference = 37E1019D3061B0EC00734336 /* FX.app */;
 			productType = "com.apple.product-type.application";
+		};
+		37F200063061B0EC00734336 /* FXWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37F200153061B0EC00734336 /* Build configuration list for PBXNativeTarget "FXWidgetExtension" */;
+			buildPhases = (
+				37F200083061B0EC00734336 /* Sources */,
+				37F200093061B0EC00734336 /* Frameworks */,
+				37F2000A3061B0EC00734336 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				37F200023061B0EC00734336 /* FXWidget */,
+				37F200013061B0EC00734336 /* Shared */,
+			);
+			name = FXWidgetExtension;
+			productName = FXWidgetExtension;
+			productReference = 37F200043061B0EC00734336 /* FXWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		37F200073061B0EC00734336 /* FXTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 37F200183061B0EC00734336 /* Build configuration list for PBXNativeTarget "FXTests" */;
+			buildPhases = (
+				37F2000B3061B0EC00734336 /* Sources */,
+				37F2000C3061B0EC00734336 /* Frameworks */,
+				37F2000D3061B0EC00734336 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				37F200133061B0EC00734336 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				37F200033061B0EC00734336 /* FXTests */,
+			);
+			name = FXTests;
+			productName = FXTests;
+			productReference = 37F200053061B0EC00734336 /* FXTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -76,6 +201,13 @@
 				TargetAttributes = {
 					37E1019C3061B0EC00734336 = {
 						CreatedOnToolsVersion = 27.0;
+					};
+					37F200063061B0EC00734336 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+					37F200073061B0EC00734336 = {
+						CreatedOnToolsVersion = 27.2;
+						TestTargetID = 37E1019C3061B0EC00734336;
 					};
 				};
 			};
@@ -94,12 +226,24 @@
 			projectRoot = "";
 			targets = (
 				37E1019C3061B0EC00734336 /* FX */,
+				37F200063061B0EC00734336 /* FXWidgetExtension */,
+				37F200073061B0EC00734336 /* FXTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		37E1019B3061B0EC00734336 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		37F2000A3061B0EC00734336 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		37F2000D3061B0EC00734336 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -112,7 +256,30 @@
 			files = (
 			);
 		};
+		37F200083061B0EC00734336 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		37F2000B3061B0EC00734336 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		37F200113061B0EC00734336 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37F200063061B0EC00734336 /* FXWidgetExtension */;
+			targetProxy = 37F200103061B0EC00734336 /* PBXContainerItemProxy */;
+		};
+		37F200133061B0EC00734336 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 37E1019C3061B0EC00734336 /* FX */;
+			targetProxy = 37F200123061B0EC00734336 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		37E101A63061B0ED00734336 /* Debug configuration for PBXProject "FX" */ = {
@@ -241,6 +408,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FX/FX.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -281,6 +449,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = FX/FX.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -316,6 +485,114 @@
 			};
 			name = Release;
 		};
+		37F200163061B0EC00734336 /* Debug configuration for PBXNativeTarget "FXWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FXWidget/FXWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6GBM8GTKU5;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FXWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FX;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.fx.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		37F200173061B0EC00734336 /* Release configuration for PBXNativeTarget "FXWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FXWidget/FXWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6GBM8GTKU5;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FXWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FX;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.fx.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		37F200193061B0EC00734336 /* Debug configuration for PBXNativeTarget "FXTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6GBM8GTKU5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.fx.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FX.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FX";
+			};
+			name = Debug;
+		};
+		37F2001A3061B0EC00734336 /* Release configuration for PBXNativeTarget "FXTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6GBM8GTKU5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fursa.fx.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FX.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/FX";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -332,6 +609,22 @@
 			buildConfigurations = (
 				37E101A93061B0ED00734336 /* Debug configuration for PBXNativeTarget "FX" */,
 				37E101AA3061B0ED00734336 /* Release configuration for PBXNativeTarget "FX" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		37F200153061B0EC00734336 /* Build configuration list for PBXNativeTarget "FXWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37F200163061B0EC00734336 /* Debug configuration for PBXNativeTarget "FXWidgetExtension" */,
+				37F200173061B0EC00734336 /* Release configuration for PBXNativeTarget "FXWidgetExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		37F200183061B0EC00734336 /* Build configuration list for PBXNativeTarget "FXTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				37F200193061B0EC00734336 /* Debug configuration for PBXNativeTarget "FXTests" */,
+				37F2001A3061B0EC00734336 /* Release configuration for PBXNativeTarget "FXTests" */,
 			);
 			defaultConfigurationName = Release;
 		};

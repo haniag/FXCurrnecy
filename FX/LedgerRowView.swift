@@ -1,6 +1,6 @@
 //
 //  LedgerRowView.swift
-//  oumleh
+//  FX
 //
 
 import SwiftUI
@@ -19,12 +19,12 @@ struct LedgerRowView: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            FlagIcon(countryCode: currency.countryCode, diameter: 28)
+            FlagIcon(currency: currency, diameter: 28)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(currency.code)
-                    .font(.rowCode)
                     .tracking(0.8)
+                    .ledgerFont(.rowCode)
                 Text(currency.name)
                     .font(.footnote)
                     .foregroundStyle(Color.inkSecondary)
@@ -35,7 +35,7 @@ struct LedgerRowView: View {
 
             VStack(alignment: .trailing, spacing: 2) {
                 Text(amount)
-                    .font(.rowAmount)
+                    .ledgerFont(.rowAmount)
                     .lineLimit(1)
                     // A very long amount shrinks rather than squeezing the name.
                     .minimumScaleFactor(0.6)
@@ -54,6 +54,8 @@ struct LedgerRowView: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+#if DEBUG
 
 #Preview("Rows") {
     VStack(spacing: 0) {
@@ -79,3 +81,5 @@ struct LedgerRowView: View {
     .padding(.horizontal, 20)
     .background(Color.paper)
 }
+
+#endif

@@ -1,6 +1,6 @@
 //
 //  MainCurrencyHeader.swift
-//  oumleh
+//  FX
 //
 
 import SwiftUI
@@ -22,14 +22,21 @@ struct MainCurrencyHeader: View {
     /// fit on one line.
     @State private var availableWidth: CGFloat = 200
 
+    /// The amount's size limits, which follow the user's text size the same
+    /// way the rows' amounts do.
+    @ScaledMetric(relativeTo: LedgerFont.rowAmount.textStyle)
+    private var largestSize = LedgerFont.rowAmount.size
+    @ScaledMetric(relativeTo: LedgerFont.rowAmount.textStyle)
+    private var smallestSize: CGFloat = 14
+
     var body: some View {
         HStack(spacing: 14) {
-            FlagIcon(countryCode: currency.countryCode, diameter: 28)
+            FlagIcon(currency: currency, diameter: 28)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(currency.code)
-                    .font(.rowCode)
                     .tracking(0.8)
+                    .ledgerFont(.rowCode)
                 Text(currency.name)
                     .font(.footnote)
                     .foregroundStyle(Color.inkSecondary)
@@ -84,9 +91,11 @@ struct MainCurrencyHeader: View {
     private var fontSize: CGFloat {
         let characters = CGFloat(max(text.count, 1))
         let fitting = availableWidth / (characters * 0.62)
-        return max(14, min(25, floor(fitting)))
+        return max(smallestSize, min(largestSize, floor(fitting)))
     }
 }
+
+#if DEBUG
 
 // MARK: - Previews
 
@@ -114,3 +123,5 @@ struct MainCurrencyHeader: View {
     )
     .background(Color.paper)
 }
+
+#endif
